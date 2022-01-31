@@ -35,10 +35,10 @@ class Users:
     def obtenerUser( cls, obtenerUser ):
         query = "SELECT * FROM users WHERE id = %(id)s;"
         resultado = connectToMySQL( "inicio_sesion" ).query_db( query, obtenerUser )
-        return resultado
+        return resultado[0]
     
     @classmethod
-    def get_by_email(cls,data):
+    def conseguirEmail(cls,data):
         query = "SELECT * FROM users WHERE email = %(email)s;"
         resultado = connectToMySQL( "inicio_sesion" ).query_db( query, data )
         if len(resultado) < 1:
