@@ -22,7 +22,6 @@ def despliegaDashboard(idUser):
             "id" : idUser
         }
         user = Users.obtenerUser(nuevoUser)
-        print("estededeedeede: ", user[0]["first_name"])
         return render_template( "dashboard.html", user=user )
 
     else:
@@ -31,21 +30,29 @@ def despliegaDashboard(idUser):
 
 @app.route( '/registrar', methods=["POST"] )
 def registrarUser_P():
-    if request.form["password"] != request.form["confirmarPassword"]:
-        flash("Las contraseñas son distintas")
-        return redirect( '/' )
-
-    if not PASS_REGEX.match(request.form["password"]): 
-        flash("La contraseña debe contener al menos un número y una letra")
+    if not NAME_REGEX.match(request.form["first_name"]): 
+        flash("El nombre solo puede contener letras", "register")
         return redirect('/')
     
     if not NAME_REGEX.match(request.form["last_name"]): 
-        flash("El apellido solo puede contener letras")
+        flash("El apellido solo puede contener letras", "register")
         return redirect('/')
     
-    if not NAME_REGEX.match(request.form["first_name"]): 
-        flash("El nombre solo puede contener letras")
+    data = { 
+        "email" : request.form["email"] 
+        }
+    user_in_db = Users.conseguirEmail(data)
+    if user_in_db:
+        flash("El e-mail ya está registrado, pruebe otro", "register")
+        return redirect("/")
+    
+    if not PASS_REGEX.match(request.form["password"]): 
+        flash("La contraseña debe contener al menos un número y una letra", "register")
         return redirect('/')
+    
+    if request.form["password"] != request.form["confirmarPassword"]:
+        flash("Las contraseñas son distintas", "register")
+        return redirect( '/' )
 
     passwordEncriptado = bcrypt.generate_password_hash(request.form["password"])
     nuevoUser = {
@@ -58,22 +65,16 @@ def registrarUser_P():
         "update_at" : datetime.today()
     }
     if not Users.validarEmail( nuevoUser ):
-        flash("E-mail inválido")
+        flash("E-mail inválido", "register")
         return redirect('/')
 
     idUser = Users.agregarUser( nuevoUser )
     if idUser == False:
-        flash("Problemas con el database")
+        flash("Problemas con el database", "register")
         return redirect('/')
 
     session["id"] = idUser
     session["email"] = request.form["email"]
-    #emails = Emails.obtenerListaEmails()
-    #for email in emails:
-    #    if nuevoEmail["correo"] == email["correo"]:
-    #        flash("El correo ya ha sido registrado")
-    #       return redirect('/')
-
     return redirect(url_for('despliegaDashboard', idUser=idUser ))
 
 
@@ -84,21 +85,16 @@ def ingresarUser_P():
         }
     user_in_db = Users.get_by_email(data)
     if not user_in_db:
-        print("E-mail no registrado")
-        flash("E-mail no registrado")
+        flash("E-mail no registrado", "login")
         return redirect("/")
 
     print("contraseña", user_in_db["password"])
     if not bcrypt.check_password_hash(user_in_db["password"], request.form['passwordUsuario']):
-        flash("Contraseña inválida")
-        print("Contraseña inválida")
+        flash("Contraseña inválida", "login")
         return redirect('/')
 
-    print("fefefefe", user_in_db)
     session["id"] = user_in_db["id"]
     session["email"] = request.form["emailUsuario"]
-    print("fefefefe", user_in_db["id"])
- 
     return redirect(url_for('despliegaDashboard', idUser=user_in_db["id"] ))
 
 
