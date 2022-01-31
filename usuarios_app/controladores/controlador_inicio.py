@@ -33,11 +33,11 @@ def registrarUser_P():
     if not NAME_REGEX.match(request.form["first_name"]): 
         flash("El nombre solo puede contener letras", "register")
         return redirect('/')
-    
+
     if not NAME_REGEX.match(request.form["last_name"]): 
         flash("El apellido solo puede contener letras", "register")
         return redirect('/')
-    
+
     data = { 
         "email" : request.form["email"] 
         }
@@ -45,11 +45,11 @@ def registrarUser_P():
     if user_in_db:
         flash("El e-mail ya está registrado, pruebe otro", "register")
         return redirect("/")
-    
+
     if not PASS_REGEX.match(request.form["password"]): 
         flash("La contraseña debe contener al menos un número y una letra", "register")
         return redirect('/')
-    
+
     if request.form["password"] != request.form["confirmarPassword"]:
         flash("Las contraseñas son distintas", "register")
         return redirect( '/' )
@@ -83,12 +83,11 @@ def ingresarUser_P():
     data = { 
         "email" : request.form["emailUsuario"] 
         }
-    user_in_db = Users.get_by_email(data)
+    user_in_db = Users.conseguirEmail(data)
     if not user_in_db:
         flash("E-mail no registrado", "login")
         return redirect("/")
 
-    print("contraseña", user_in_db["password"])
     if not bcrypt.check_password_hash(user_in_db["password"], request.form['passwordUsuario']):
         flash("Contraseña inválida", "login")
         return redirect('/')
