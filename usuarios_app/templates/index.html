@@ -16,7 +16,7 @@
                     Registro
                 </h1>
                 <div class="error">
-                    {% with messages = get_flashed_messages() %}
+                    {% with messages = get_flashed_messages(category_filter=['register']) %}
                         {% for message in messages %}
                             <p>
                                 {{message}}
@@ -64,7 +64,7 @@
                             <label for="gender">Male</label>
                             <input type="radio" id="gender" name="gender" value="female">
                             <label for="gender">Female</label>
-                            <input type="radio" id="gender" name="gender" value="nada">
+                            <input type="radio" id="gender" name="gender" value="nada" checked>
                             <label for="gender">No elije</label>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                     Login
                 </h1>
                 <div class="error">
-                    {% with messages = get_flashed_messages() %}
+                    {% with messages = get_flashed_messages(category_filter=['login']) %}
                         {% for message in messages %}
                             <p>
                                 {{message}}
